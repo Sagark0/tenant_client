@@ -114,6 +114,7 @@ const Tenants = ({ route, navigation }) => {
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({room_id: room.room_id})
     })
       .then((res) => {
         if (!res.ok) {
@@ -219,7 +220,7 @@ const Tenants = ({ route, navigation }) => {
           />
         )}
       </List.Section>
-      {tenants.length != 0 && <Surface style={tenantDetailsStyles.surface}>
+      {tenants.length != 0 && <Surface style={tenantDetailsStyles.surface} elevation={0}>
         <PaymentModal
           modalVisible={paymentModalVisible}
           setModalVisible={setPaymentModalVisible}
