@@ -37,6 +37,7 @@ export default function Home({ navigation }) {
       .finally(() => setLoading(false));
   }, []);
 
+  // API to add new property
   const handleAddPropertySubmit = (values) => {
     console.log(values);
     fetch(`${apiURL}/properties`, {

@@ -5,7 +5,6 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { apiURL, propertyDefaultImage } from "../utility/constants";
 
 const PropertyCard = ({ navigation, property, setProperties }) => {
-  const [modalVisible, setModalVisible] = useState(false);
  const [activeMenuPropertyId, setActiveMenuPropertyId] = useState(null);
   const openMenu = (property_id) => setActiveMenuPropertyId(property_id);
   const closeMenu = () => setActiveMenuPropertyId(null);

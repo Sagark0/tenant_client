@@ -9,17 +9,16 @@ import TenantDetails from "../screens/tenantDetails";
 const Stack = createNativeStackNavigator();
 
 export default function HomeStack() {
-  const [newRoom, setNewRoom] = useState({});
   return (
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Home"
-        screenOptions={({ navigation, route }) => ({
-          headerRight: () => <HeaderMenu navigation={navigation} setNewRoom={setNewRoom} />,
-        })}
+        // screenOptions={({ navigation, route }) => ({
+        //   headerRight: () => <HeaderMenu navigation={navigation} />,
+        // })}
       >
         <Stack.Screen name="Home" component={Home}/>
-        <Stack.Screen name="Rooms" component={Rooms} initialParams={{newRoom: newRoom}}/>
+        <Stack.Screen name="Rooms" component={Rooms}/>
         <Stack.Screen name="Tenants" component={Tenants} />
         <Stack.Screen name="Tenant Details" component={TenantDetails} />
       </Stack.Navigator>

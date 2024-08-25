@@ -11,16 +11,15 @@ export const roomEditFormData = [
     formLabel: "Room Capacity",
     keyboardType: "numeric",
   },
+  {
+    formType: "text",
+    formTitle: "room_rent",
+    formLabel: "Room Rent",
+    keyboardType: "numeric",
+  },
 ];
 
 export const roomAddFormData = [
-  // { formType: "autocomplete", formTitle: "property_id", formLabel: "Property"},
-  {
-    formType: "text",
-    formTitle: "property_id",
-    formLabel: "Property ID",
-    keyboardType: "numeric",
-  },
   {
     formType: "text",
     formTitle: "room_no",
@@ -31,6 +30,12 @@ export const roomAddFormData = [
     formType: "text",
     formTitle: "room_capacity",
     formLabel: "Room Capacity",
+    keyboardType: "numeric",
+  },
+  {
+    formType: "text",
+    formTitle: "room_rent",
+    formLabel: "Room Rent",
     keyboardType: "numeric",
   },
 ];

@@ -1,30 +1,32 @@
 import { View, StyleSheet } from 'react-native';
 import { Snackbar } from 'react-native-paper';
 
-const SnackView = ({visible, setVisible, message}) => {
+const SnackView = ({ visible, setVisible, message }) => {
   const onDismissSnackBar = () => setVisible(false);
 
   return (
-    <View style={styles.container}>
-      <Snackbar
-        visible={visible}
-        onDismiss={onDismissSnackBar}
-        action={{
-          label: 'Close',
-          onPress: () => {
-            // Do something
-          },
-        }}>
-        {message}
-      </Snackbar>
-    </View>
+    <Snackbar
+      visible={visible}
+      onDismiss={onDismissSnackBar}
+      action={{
+        label: 'Close',
+        onPress: () => {
+          // Do something
+        },
+      }}
+      style={styles.snackbar} // Added styles for positioning
+    >
+      {message}
+    </Snackbar>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
+  snackbar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
 
