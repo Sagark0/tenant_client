@@ -39,6 +39,7 @@ export default function Home({ navigation }) {
 
   // API to add new property
   const handleAddPropertySubmit = (values) => {
+    values["property_name"] = capitaliseWords(values["property_name"]);
     console.log(values);
     fetch(`${apiURL}/properties`, {
       method: "POST",
@@ -65,8 +66,30 @@ export default function Home({ navigation }) {
       .finally(() => setSnackbarVisible(true));
   };
 
+  // api to delete property
+  handlePropertyDelete = (id) => {
+    fetch(`${apiURL}/properties/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      if (!res.ok) {
+        throw Error("Network response was not ok");
+      } else {
+        setProperties((prev) => prev.filter((property) => property.property_id !== id));
+        setSnackbarMessage("Property deleted successfully");
+      }
+    }).catch((err) => {
+      setSnackbarMessage("Error while deleting property");
+      console.log("Error", err);
+    }).finally(() => {
+      setSnackbarVisible(true);
+    });
+  };
+
   return (
-    <View style={globalStyles.container}>
+    <View style={{ flex: 1 }}>
       <ModalTemplate
         title="Add Property Details"
         initData={getEmptyInitData(propertyAddFormData)}
@@ -77,7 +100,7 @@ export default function Home({ navigation }) {
       />
       <Button
         icon="plus"
-        style={{ marginBottom: 4 }}
+        style={{ marginVertical: 4 }}
         onPress={() => setAddPropertyModalVisible(true)}
       >
         Add Property
@@ -89,7 +112,7 @@ export default function Home({ navigation }) {
           data={properties}
           keyExtractor={(item) => item.property_id.toString()}
           renderItem={({ item }) => (
-            <PropertyCard navigation={navigation} property={item} setProperties={setProperties} />
+            <PropertyCard navigation={navigation} property={item} setProperties={setProperties} handlePropertyDelete={handlePropertyDelete} />
           )}
         />
       )}

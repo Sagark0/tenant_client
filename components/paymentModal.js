@@ -5,11 +5,19 @@ import { Formik } from "formik";
 import { apiURL } from "../utility/constants";
 import SnackView from "./snackbar";
 import { useState } from "react";
-const PaymentModal = ({ modalVisible, setModalVisible, room_id }) => {
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+const PaymentModal = ({
+  modalVisible,
+  setModalVisible,
+  room_id,
+  electricity_reading,
+  totalDues,
+  setSnackbarMessage,
+  setSnackbarVisible,
+  fetchDues,
+}) => {
   // Handling add payment
   const handleSubmit = (values) => {
+    values["prev_electricity_reading"] = electricity_reading;
     console.log(values);
     fetch(`${apiURL}/payments/${room_id}`, {
       method: "POST",
@@ -24,6 +32,7 @@ const PaymentModal = ({ modalVisible, setModalVisible, room_id }) => {
       })
       .then((data) => {
         console.log(data);
+        fetchDues();
         setSnackbarMessage("Payment added successfully");
       })
       .catch((err) => {
@@ -32,7 +41,9 @@ const PaymentModal = ({ modalVisible, setModalVisible, room_id }) => {
       })
       .finally(() => {
         setModalVisible(false);
-        setSnackbarVisible(true);
+        setTimeout(() => {
+          setSnackbarVisible(true);
+        }, 100);
       });
   };
   return (
@@ -54,39 +65,71 @@ const PaymentModal = ({ modalVisible, setModalVisible, room_id }) => {
               borderRadius: 10,
             }}
           >
-            <Text> Payment </Text>
-            <SnackView
-              visible={snackbarVisible}
-              setVisible={setSnackbarVisible}
-              message={snackbarMessage}
-            />
+            <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>Payment</Text>
+            <Text style={{marginBottom: 7}}>
+              Last Electricity Reading:{" "}
+              {electricity_reading || (
+                  <Text style={{ marginBottom: 20, fontSize: 12, color: "red" }}>{"\n"}Last electricity reading not added!</Text>
+              )}
+            </Text>
+            <Text>Remaining Dues: {totalDues} </Text>
             <Formik
-              initialValues={{ payment_amount: "" }}
+              initialValues={{
+                payment_amount: "",
+                new_electricity_reading: "",
+                electricity_rate: "",
+              }}
               onSubmit={(values) => handleSubmit(values)}
             >
-              {(props) => (
-                <View>
-                  <TextInput
-                    label="Amount"
-                    value={props.values.payment_amount}
-                    keyboardType="numeric"
-                    onChangeText={props.handleChange("payment_amount")}
-                    style={{ marginTop: 15}}
-                  />
-                  <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 20 }}>
-                    <Button mode="outlined" onPress={() => setModalVisible(false)}>
-                      Close
-                    </Button>
-                    <Button
-                      mode="contained"
-                      style={{ marginLeft: 15 }}
-                      onPress={props.handleSubmit}
+              {(props) => {
+                const totalNewDues =
+                  totalDues +
+                  (parseFloat(props.values.new_electricity_reading || 0) -
+                    parseFloat(electricity_reading)) *
+                    parseFloat(props.values.electricity_rate || 0);
+                return (
+                  <View>
+                    <TextInput
+                      label="New Electricity Reading"
+                      value={props.values.new_electricity_reading}
+                      keyboardType="numeric"
+                      onChangeText={props.handleChange("new_electricity_reading")}
+                      style={{ marginTop: 15 }}
+                    />
+                    <TextInput
+                      label="Rate"
+                      value={props.values.electricity_rate}
+                      keyboardType="numeric"
+                      onChangeText={props.handleChange("electricity_rate")}
+                      style={{ marginTop: 15 }}
+                    />
+                    <TextInput
+                      label="Amount"
+                      value={props.values.payment_amount}
+                      keyboardType="numeric"
+                      onChangeText={props.handleChange("payment_amount")}
+                      style={{ marginTop: 15 }}
+                    />
+                    <Text>
+                      Total Dues: {isNaN(totalNewDues) ? totalDues : totalNewDues.toFixed(2)}
+                    </Text>
+                    <View
+                      style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 20 }}
                     >
-                      Add Payment
-                    </Button>
+                      <Button mode="outlined" onPress={() => setModalVisible(false)}>
+                        Close
+                      </Button>
+                      <Button
+                        mode="contained"
+                        style={{ marginLeft: 15 }}
+                        onPress={props.handleSubmit}
+                      >
+                        Add Payment
+                      </Button>
+                    </View>
                   </View>
-                </View>
-              )}
+                );
+              }}
             </Formik>
           </View>
         </View>

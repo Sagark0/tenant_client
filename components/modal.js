@@ -5,15 +5,17 @@ import {
   Pressable,
   Keyboard,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
-import { TextInput } from "react-native-paper";
+import { Button, IconButton, Menu, TextInput } from "react-native-paper";
 import { screenWidth } from "../utility/constants";
 import { Formik } from "formik";
 import { globalStyles } from "../styles/globalStyles";
-import AutocompleteInput from "react-native-autocomplete-input";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import { useState } from "react";
+import { captureImage, deleteImage, pickImage, uploadImage } from "../utility/imageUpload";
 const ModalTemplate = ({
   title,
   initData,
@@ -22,6 +24,15 @@ const ModalTemplate = ({
   formData,
   handleSubmit,
 }) => {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
   return (
     <Modal
       transparent={true}
@@ -47,75 +58,122 @@ const ModalTemplate = ({
             }}
           >
             <Text style={{ fontSize: 17, fontWeight: "bold" }}>{title}</Text>
-            <Formik initialValues={{ ...initData }} onSubmit={(values) => handleSubmit(values)}>
-              {(props) => (
-                <View>
-                  {formData?.map((input) => {
-                    if (input.formType === "text") {
-                      return (
-                        <TextInput
-                          key={input.formTitle}
-                          label={input.formLabel}
-                          value={(props.values[input.formTitle] || "").toString()}
-                          onChangeText={props.handleChange(input.formTitle)}
-                          keyboardType={input.keyboardType || "default"}
-                          style={{ marginTop: 10 }}
-                          disabled={input.disabled === "true"}
-                        />
-                      );
-                    }
-                    if (input.formType === "datepicker") {
-                      return (
-                        <View key={input.formTitle} style={styles.datepickerView}>
-                          <Text style={{ color: "#49454f", fontSize: 15, marginLeft: 5 }}>
-                            {input.formLabel}
-                          </Text>
-                          <DateTimePicker
-                            value={new Date(props.values[input.formTitle])}
-                            mode="date"
-                            display="default"
-                            onChange={(event, selectedDate) => {
-                              const currentDate = selectedDate || props.values[input.formTitle];
-                              props.setFieldValue(input.formTitle, currentDate);
-                            }}
+            <ScrollView>
+              <Formik initialValues={{ ...initData }} onSubmit={(values) => handleSubmit(values)}>
+                {(props) => (
+                  <View>
+                    {formData?.map((input) => {
+                      if (input.formType === "text") {
+                        return (
+                          <TextInput
+                            key={input.formTitle}
+                            label={input.formLabel}
+                            value={(props.values[input.formTitle] || "").toString()}
+                            onChangeText={props.handleChange(input.formTitle)}
+                            keyboardType={input.keyboardType || "default"}
+                            style={{ marginTop: 10 }}
+                            disabled={input.disabled === "true"}
                           />
-                        </View>
-                      );
-                    }
-                    {
-                      /* if (input.formType === "autocomplete") {
-                    console.log("input", input)
-                    return (
-                      <AutocompleteInput
-                        key={input.formTitle}
-                        label={input.formLabel}
-                        value={(props.values[input.formTitle] || "").toString()}
-                        onChange={props.handleChange(input.formTitle)}
-                        options={[
-                          { label: "New York", value: "new_york" },
-                          { label: "Los Angeles", value: "los_angeles" },
-                          { label: "Chicago", value: "chicago" },
-                        ] || [] }
-                      />
-                    );
-                  } */
-                    }
-                    return null;
-                  })}
-                  <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                    <Pressable
-                      onPress={() => setModalVisible(false)}
-                      style={globalStyles.pressableButton}
+                        );
+                      }
+                      if (input.formType === "datepicker") {
+                        return (
+                          <View key={input.formTitle} style={styles.inputView}>
+                            <Text style={{ color: "#49454f", fontSize: 15, marginLeft: 5 }}>
+                              {input.formLabel}
+                            </Text>
+                            <TouchableOpacity onPress={showDatePicker}>
+                              <Text style={{ color: "#007aff", fontSize: 17 }}>
+                                {props.values[input.formTitle]
+                                  ? new Date(props.values[input.formTitle]).toLocaleDateString()
+                                  : "Select Date"}
+                              </Text>
+                            </TouchableOpacity>
+                            {isDatePickerVisible && (
+                              <DateTimePicker
+                                value={new Date(props.values[input.formTitle])}
+                                mode="date"
+                                display="default"
+                                onChange={(event, selectedDate) => {
+                                  hideDatePicker();
+                                  const currentDate = selectedDate || props.values[input.formTitle];
+                                  props.setFieldValue(input.formTitle, currentDate);
+                                }}
+                                onClose={hideDatePicker} // Close picker on cancel
+                              />
+                            )}
+                          </View>
+                        );
+                      }
+                      if (input.formType === "file") {
+                        return (
+                          <View key={input.formTitle} style={styles.inputView}>
+                            <Text style={{ color: "#49454f", fontSize: 15, marginLeft: 5 }}>
+                              {props.values[input.formTitle]?.fileName || input.formLabel}
+                            </Text>
+                            {!props.values[input.formTitle]?.fileName ? (
+                              <View style={{ flexDirection: "row" }}>
+                                <IconButton
+                                  icon="camera"
+                                  size={20}
+                                  onPress={async () => {
+                                    const { uri, fileName } = await captureImage();
+                                    props.setFieldValue(input.formTitle, {
+                                      uri,
+                                      fileName,
+                                    });
+                                  }}
+                                />
+                                <IconButton
+                                  icon="view-gallery"
+                                  size={20}
+                                  onPress={async () => {
+                                    const { uri, fileName } = await pickImage();
+                                    props.setFieldValue(input.formTitle, {
+                                      uri,
+                                      fileName,
+                                    });
+                                  }}
+                                />
+                              </View>
+                            ) : (
+                              <View style={{ flexDirection: "row" }}>
+                                <Button
+                                  onPress={async () => {
+                                    await deleteImage(props.values[input.formTitle]?.fileName)
+                                    props.setFieldValue(input.formTitle, {
+                                      uri: null,
+                                      fileName: null,
+                                    });
+                                  }}
+                                >
+                                  Remove
+                                </Button>
+                              </View>
+                            )}
+                          </View>
+                        );
+                      }
+                      return null;
+                    })}
+                    <View
+                      style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 15 }}
                     >
-                      <Text style={globalStyles.pressableText}>Cancel</Text>
-                    </Pressable>
-                    <Pressable onPress={props.handleSubmit} style={globalStyles.pressableButton}>
-                      <Text style={globalStyles.pressableText}>Submit</Text>
-                    </Pressable>
+                      <Button mode="contained" onPress={() => setModalVisible(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        mode="contained"
+                        onPress={props.handleSubmit}
+                        style={{ marginLeft: 10 }}
+                      >
+                        Submit
+                      </Button>
+                    </View>
                   </View>
-                </View>
-              )}
-            </Formik>
+                )}
+              </Formik>
+            </ScrollView>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -126,7 +184,7 @@ const ModalTemplate = ({
 export default ModalTemplate;
 
 const styles = StyleSheet.create({
-  datepickerView: {
+  inputView: {
     marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -135,5 +193,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomColor: "#a29da5",
     borderBottomWidth: 0.5,
+    height: 60,
+    borderTopEndRadius: 5,
+    borderTopLeftRadius: 5,
   },
 });

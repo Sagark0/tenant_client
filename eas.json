@@ -13,6 +13,7 @@
     "production": {
         "env": {
           "EXPO_PUBLIC_BACKEND_URL": "https://tenant-server-gx7q.onrender.com",
+          "EXPO_PUBLIC_SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmdmt3Z2hwcnVhbGVzcWlsdXhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM0NjI4OTksImV4cCI6MjAzOTAzODg5OX0.5z1kS3OrQH2tz2dYBnTRJLHFT2x2qorNv6igOVOfjxY",
           "APP_ICON": "./assets/Tenants_App_Icon.jpg",
           "APP_NAME": "Tenants"
         }

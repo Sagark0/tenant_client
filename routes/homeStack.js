@@ -14,12 +14,24 @@ export default function HomeStack() {
       <Stack.Navigator
         initialRouteName="Home"
         // screenOptions={({ navigation, route }) => ({
-        //   headerRight: () => <HeaderMenu navigation={navigation} />,
-        // })}
+        //     headerTransparent: true,
+        //     headerStyle: {
+        //       backgroundColor: "transparent",
+        //     },
+        //   })}
       >
-        <Stack.Screen name="Home" component={Home}/>
-        <Stack.Screen name="Rooms" component={Rooms}/>
-        <Stack.Screen name="Tenants" component={Tenants} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Rooms" component={Rooms} />
+        <Stack.Screen
+          name="Tenants"
+          component={Tenants}
+          // options={{
+          //   headerTransparent: true,
+          //   headerStyle: {
+          //     backgroundColor: "transparent",
+          //   },
+          // }}
+        />
         <Stack.Screen name="Tenant Details" component={TenantDetails} />
       </Stack.Navigator>
     </NavigationContainer>

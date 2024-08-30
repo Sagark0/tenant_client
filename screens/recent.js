@@ -1,15 +1,22 @@
 import { useState } from "react";
-import { DataTable, Surface } from "react-native-paper";
+import { ActivityIndicator, Button, DataTable, Surface } from "react-native-paper";
 import { useEffect } from "react";
 import { apiURL } from "../utility/constants";
 import { formatDate } from "../utility/utils";
 import { View, Text } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import SnackView from "../components/snackbar";
+import moment from "moment";
 
 const RecentsRoute = () => {
   const [page, setPage] = useState(0);
   const [numberOfItemsPerPageList] = useState([2, 4, 6]);
-  const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[0]);
+  const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[1]);
   const [items, setItems] = useState([]); //storing dues data
+  const [lastDuesChecked, setLastDueChecked] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     fetch(`${apiURL}/payments/dues`)
@@ -27,26 +34,78 @@ const RecentsRoute = () => {
         console.log("Error fetching dues:", err);
       });
   }, []);
-  const from = page * itemsPerPage;
-  const to = Math.min((page + 1) * itemsPerPage, items.length);
 
   useEffect(() => {
     setPage(0);
   }, [itemsPerPage]);
+
+  // check last dues checked
+  const fetchLastGenerated = async () => {
+    const lastGenerated = await AsyncStorage.getItem("last_due_generated_time");
+    if (lastGenerated) {
+      setLastDueChecked(lastGenerated);
+    } else {
+      setLastDueChecked("Never");
+    }
+  };
+
+  const from = page * itemsPerPage;
+  const to = Math.min((page + 1) * itemsPerPage, items.length);
+
+  const handleRunNewDuesCheck = () => {
+    setIsLoading(true);
+    fetch(`${apiURL}/payments/generateDues`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Network response was not OK");
+        }
+        AsyncStorage.setItem("last_due_generated_time", moment().toISOString());
+        console.log("Dues generated successfully");
+        setSnackbarMessage("Dues checked successfully")
+      })
+      .catch((err) => {
+        console.log("Error while generating dues:", err.message || err);
+        setSnackbarMessage("Error while generating dues")
+      })
+      .finally(() => {
+        setIsLoading(false);
+        fetchLastGenerated();
+        setSnackbarVisible(true);
+      });
+  };
+
   return (
     <View>
-
-    {/* All Dues */}
+      <SnackView
+        visible={snackbarVisible}
+        setVisible={setSnackbarVisible}
+        message={snackbarMessage}
+      />
+      {/* All Dues */}
       <View
         style={{
           marginHorizontal: 10,
-          marginVertical:20,
+          marginVertical: 10,
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
         }}
       >
-        <Text>All Dues</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Text>All Dues</Text>
+          {isLoading ? (
+            <ActivityIndicator animating={true} style={{ marginRight: 30 }} />
+          ) : (
+            <Button onPress={handleRunNewDuesCheck}>Run new dues check</Button>
+          )}
+        </View>
       </View>
       <Surface>
         <DataTable>
@@ -79,9 +138,18 @@ const RecentsRoute = () => {
           />
         </DataTable>
       </Surface>
-
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "row",
+          marginVertical: 10,
+        }}
+      >
+        <Text>Last Due Checked: {lastDuesChecked} </Text>
+        {!lastDuesChecked && <Button onPress={fetchLastGenerated}>Check</Button>}
+      </View>
       {/* Recent Payments */}
-      
     </View>
   );
 };

@@ -12,9 +12,15 @@ export const tenantEditFormData = [
       },
       {
         formType: "text",
-        formTitle: "available_balance",
-        formLabel: "Avail Balance(in Rs.)",
+        formTitle: "room_no",
+        formLabel: "Room No",
+        disabled: "true"
       },
+      // {
+      //   formType: "text",
+      //   formTitle: "available_balance",
+      //   formLabel: "Avail Balance(in Rs.)",
+      // },
       {
         formType: "datepicker",
         formTitle: "move_in_date",
@@ -25,11 +31,6 @@ export const tenantEditFormData = [
       //   formTitle: "last_due_created_month",
       //   formLabel: "Last Due Created Month",
       // },
-      {
-        formType: "text",
-        formTitle: "room_id",
-        formLabel: "Room ID",
-      },
       {
         formType: "text",
         formTitle: "phone_no",
@@ -45,6 +46,11 @@ export const tenantEditFormData = [
         formTitle: "document_number",
         formLabel: "Document Number",
       },
+      {
+        formType: "file",
+        formTitle: "document_file_path",
+        formLabel: "Upload Document"
+      }
 
 ]
 
@@ -76,4 +82,9 @@ export const tenantAddFormData = [
     formLabel: "Document Number",
     keyboardType: "numeric"
   },
+  {
+    formType: "file",
+    formTitle: "document_file_path",
+    formLabel: "Upload Document"
+  }
 ]

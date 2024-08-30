@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 export const tenantDetailsStyles = StyleSheet.create({
     surface: {
-      marginVertical: 10,
+      marginTop: 10,
+      marginBottom: 20,
       padding: 15,
       borderRadius: 8,
       elevation: 4,
@@ -31,6 +32,6 @@ export const tenantDetailsStyles = StyleSheet.create({
     },
     divider: {
       marginVertical: 10,
-      backgroundColor: "#ddd",
+      backgroundColor: "#000",
     },
   });

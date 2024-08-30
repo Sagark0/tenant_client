@@ -53,10 +53,15 @@ export default function Rooms({ route, navigation }) {
         setRooms((prev) =>
           prev.map((room) => (data.room_id === room.room_id ? { ...room, ...data } : room))
         );
+        setSnackbarMessage("Room updated successfully");
         setEditingRoom(null); // Close modal after update
       })
       .catch((err) => {
         console.log("Error updating room:", err);
+        setSnackbarVisible("Error while updating room");
+      })
+      .finally(() => {
+        setSnackbarVisible(true);
       });
   };
 
@@ -74,10 +79,15 @@ export default function Rooms({ route, navigation }) {
         } else {
           setRooms((prev) => prev.filter((room) => room.room_id !== id));
           console.log(`Room deleted successfully`);
+          setSnackbarMessage("Room deleted successfully");
         }
       })
       .catch((err) => {
         console.log("Error deleting room:", err);
+        setSnackbarMessage("Error while deleting room");
+      })
+      .finally(() => {
+        setSnackbarVisible(true);
       });
   };
 
@@ -111,7 +121,7 @@ export default function Rooms({ route, navigation }) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, marginBottom: 50 }}>
       <ModalTemplate
         title="Add Room Details"
         initData={getEmptyInitData(roomAddFormData)}

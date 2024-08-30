@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.user"
@@ -29,6 +29,14 @@
       "eas": {
         "projectId": "3fe08d97-d0f2-4544-8d1c-4123f90527b3"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share it."
+        }
+      ]
+    ]
   }
 }

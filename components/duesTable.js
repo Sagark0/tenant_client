@@ -2,27 +2,10 @@ import { useState, useEffect } from "react";
 import { DataTable } from "react-native-paper";
 import { apiURL } from "../utility/constants";
 import { formatDate } from "../utility/utils";
-const DuesTable = ({ room_id }) => {
+const DuesTable = ({ items }) => {
   const [page, setPage] = useState(0);
   const [numberOfItemsPerPageList] = useState([2, 3, 4]);
   const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[0]);
-const [items, setItems] = useState([]); //storing dues data
-  useEffect(() => {
-    fetch(`${apiURL}/payments/dues/${room_id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("data", data);
-        setItems(data);
-      })
-      .catch((err) => {
-        console.log("Error fetching dues:", err);
-      });
-  }, []);
 
   const from = page * itemsPerPage;
   const to = Math.min((page + 1) * itemsPerPage, items.length);

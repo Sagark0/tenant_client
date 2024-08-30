@@ -1,19 +1,19 @@
 import HeaderMenu from "../components/headerMenu";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import RecentsRoute from "../screens/recent";
 const Stack = createNativeStackNavigator();
+import NotificationsRoute from "../screens/notifications";
 
-export default function DueAndPaymentStack() {
+export default function NotificationStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Recents"
+        initialRouteName="Notifications"
         // screenOptions={({ navigation, route }) => ({
         //   headerRight: () => <HeaderMenu navigation={navigation} />,
         // })}
       >
-        <Stack.Screen name="Recents" component={RecentsRoute}/>
+        <Stack.Screen name="Notifications" component={NotificationsRoute}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
