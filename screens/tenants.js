@@ -27,10 +27,16 @@ import PaymentModal from "../components/paymentModal";
 import DuesTable from "../components/duesTable";
 import { tenantDetailsStyles } from "../styles/tenantDetailsStyles";
 import { tenantAddFormData } from "../utility/formData/tenantFormData";
-import { capitaliseWords, formatDate, getEmptyInitData, handleWhatsAppMessage } from "../utility/utils";
+import {
+  capitaliseWords,
+  formatDate,
+  getEmptyInitData,
+  handleWhatsAppMessage,
+} from "../utility/utils";
 import { globalStyles } from "../styles/globalStyles";
 import { roomUpdateFormData } from "../utility/formData/roomFormData";
 import { uploadImage } from "../utility/imageUpload";
+import DeleteModal from "../components/deleteModal";
 
 const Tenants = ({ route, navigation }) => {
   const { property } = route.params;
@@ -45,6 +51,8 @@ const Tenants = ({ route, navigation }) => {
   const [updateRoomModalVisible, setUpdateRoomModalVisible] = useState(false);
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
   const [headerMenuVisible, setHeaderMenuVisible] = useState(false);
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const [tenantDeleteModalVisible, setTenantDeleteModalVisible] = useState(false);
   const [dues, setDues] = useState([]);
   const [totalDues, setTotalDues] = useState();
   const headerMenuOpen = () => setHeaderMenuVisible(true);
@@ -52,8 +60,8 @@ const Tenants = ({ route, navigation }) => {
 
   const openMenu = (tenant) => {
     tenant["room_no"] = room.room_no;
-    var modTenant = {...tenant};
-    modTenant["document_file_path"] = null
+    var modTenant = { ...tenant };
+    modTenant["document_file_path"] = null;
     modTenant["document_file_path"] = { fileName: tenant.document_file_path, uri: null };
     setSelectedTenant(modTenant);
     setVisible(true);
@@ -105,6 +113,7 @@ const Tenants = ({ route, navigation }) => {
 
   // api to handle tenant submit
   const handleAddTenantSubmit = async (values) => {
+    setIsSubmitLoading(true);
     values["tenant_name"] = capitaliseWords(values["tenant_name"]);
     values["last_due_created_month"] = values["move_in_date"];
     values["room_id"] = room.room_id;
@@ -139,12 +148,14 @@ const Tenants = ({ route, navigation }) => {
       })
       .finally(() => {
         setAddTenantModalVisible(false);
+        setIsSubmitLoading(false);
         setSnackbarVisible(true);
       });
   };
 
   // api to edit tenant details
   const handleEditTenant = async (values) => {
+    setIsSubmitLoading(true);
     values["tenant_name"] = capitaliseWords(values["tenant_name"]);
     values["room_id"] = room.room_id;
     if (values.phone_no && !values["phone_no"].startsWith("+91")) {
@@ -181,6 +192,7 @@ const Tenants = ({ route, navigation }) => {
         setSnackbarMessage("Error occured while editing tenant");
       })
       .finally(() => {
+        setIsSubmitLoading(false);
         setSnackbarVisible(true);
       });
   };
@@ -209,6 +221,7 @@ const Tenants = ({ route, navigation }) => {
       })
       .finally(() => {
         setSnackbarVisible(true);
+        setTenantDeleteModalVisible(false);
       });
   };
 
@@ -242,6 +255,11 @@ const Tenants = ({ route, navigation }) => {
 
   return (
     <ScrollView style={{ flex: 1 }}>
+      <DeleteModal
+        modalVisible={tenantDeleteModalVisible}
+        setModalVisible={setTenantDeleteModalVisible}
+        handleConfirm={() => handleTenantDelete(selectedTenant.tenant_id)}
+      />
       <ModalTemplate
         title="Update Room Details"
         initData={room}
@@ -257,7 +275,9 @@ const Tenants = ({ route, navigation }) => {
         setModalVisible={setAddTenantModalVisible}
         formData={tenantAddFormData}
         handleSubmit={handleAddTenantSubmit}
+        isLoading={isSubmitLoading}
       />
+
       <SnackView
         visible={snackbarVisible}
         setVisible={setSnackbarVisible}
@@ -355,7 +375,10 @@ const Tenants = ({ route, navigation }) => {
                     visible={visible && selectedTenant?.tenant_id === item.tenant_id}
                     onDismiss={closeMenu}
                     anchor={
-                      <TouchableOpacity onPress={() => openMenu(item)}  style={{  paddingTop: 7, paddingLeft: 20}}>
+                      <TouchableOpacity
+                        onPress={() => openMenu(item)}
+                        style={{ paddingTop: 7, paddingLeft: 20 }}
+                      >
                         <List.Icon icon="dots-vertical" />
                       </TouchableOpacity>
                     }
@@ -370,7 +393,8 @@ const Tenants = ({ route, navigation }) => {
                     <Menu.Item
                       onPress={() => {
                         closeMenu();
-                        handleTenantDelete(item.tenant_id);
+                        setTenantDeleteModalVisible(true);
+                        // handleTenantDelete(item.tenant_id);
                       }}
                       title="Delete Tenant"
                     />
@@ -431,6 +455,7 @@ const Tenants = ({ route, navigation }) => {
           setModalVisible={setModalVisible}
           formData={tenantEditFormData}
           handleSubmit={handleEditTenant}
+          isLoading={isSubmitLoading}
         />
       )}
     </ScrollView>

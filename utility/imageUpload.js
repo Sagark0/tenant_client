@@ -76,7 +76,8 @@ export const deleteImage = async (fileName) => {
     .remove([`documents/${fileName}`]));
 };
 
-export const fetchImage = async (fileName, setImageUri) => {
+export const fetchImage = async (fileName, setImageUri, setIsDisabled) => {
+  setIsDisabled(true);
   const { data, error } = await supabase.storage.from(bucketName).download(`documents/${fileName}`);
   const fr = new FileReader();
   fr.readAsDataURL(data);
@@ -85,6 +86,7 @@ export const fetchImage = async (fileName, setImageUri) => {
   };
   console.log("supabase", data);
   console.log("error", error);
+  if(error) setIsDisabled(false);
   return data
 };
 

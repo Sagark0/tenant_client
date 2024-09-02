@@ -9,6 +9,7 @@ import { fetchImage } from "../utility/imageUpload";
 const TenantDetails = ({ route }) => {
   const { tenant, room_no } = route.params;
   const [imageUri, setImageUri] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false);
   console.log(tenant);
   const avatarLabel = tenant.tenant_name
     .split(" ")
@@ -57,7 +58,7 @@ const TenantDetails = ({ route }) => {
 
         <Text>Document: {tenant.document_file_path || "Not Available"}</Text>
         {tenant.document_file_path && (
-          <Button onPress={() => fetchImage(tenant.document_file_path, setImageUri)}>
+          <Button onPress={() => fetchImage(tenant.document_file_path, setImageUri, setIsDisabled)} disabled={isDisabled}>
             Preview
           </Button>
         )}

@@ -9,7 +9,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { Button, IconButton, Menu, TextInput } from "react-native-paper";
+import { ActivityIndicator, Button, IconButton, Menu, TextInput } from "react-native-paper";
 import { screenWidth } from "../utility/constants";
 import { Formik } from "formik";
 import { globalStyles } from "../styles/globalStyles";
@@ -23,6 +23,7 @@ const ModalTemplate = ({
   setModalVisible,
   formData,
   handleSubmit,
+  isLoading = false,
 }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const showDatePicker = () => {
@@ -140,7 +141,7 @@ const ModalTemplate = ({
                               <View style={{ flexDirection: "row" }}>
                                 <Button
                                   onPress={async () => {
-                                    await deleteImage(props.values[input.formTitle]?.fileName)
+                                    await deleteImage(props.values[input.formTitle]?.fileName);
                                     props.setFieldValue(input.formTitle, {
                                       uri: null,
                                       fileName: null,
@@ -156,20 +157,29 @@ const ModalTemplate = ({
                       }
                       return null;
                     })}
-                    <View
-                      style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 15 }}
-                    >
-                      <Button mode="contained" onPress={() => setModalVisible(false)}>
-                        Cancel
-                      </Button>
-                      <Button
-                        mode="contained"
-                        onPress={props.handleSubmit}
-                        style={{ marginLeft: 10 }}
+                    {isLoading ? (
+                      <View
+                        style={{ marginTop: 15, justifyContent: "center", alignItems: "center" }}
                       >
-                        Submit
-                      </Button>
-                    </View>
+                        <ActivityIndicator animating={true} />
+                        <Text style={{ color: "#5C5C5C", marginTop: 5 }}>Please Wait! Don't close the App.</Text>
+                      </View>
+                    ) : (
+                      <View
+                        style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 15 }}
+                      >
+                        <Button mode="contained" onPress={() => setModalVisible(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          mode="contained"
+                          onPress={props.handleSubmit}
+                          style={{ marginLeft: 10 }}
+                        >
+                          Submit
+                        </Button>
+                      </View>
+                    )}
                   </View>
                 )}
               </Formik>
